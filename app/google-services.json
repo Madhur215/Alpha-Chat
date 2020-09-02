@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "634290726757",
+    "firebase_url": "https://alpha-chat-24375.firebaseio.com",
+    "project_id": "alpha-chat-24375",
+    "storage_bucket": "alpha-chat-24375.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634290726757:android:19b5c655498a4c0711238c",
+        "android_client_info": {
+          "package_name": "com.example.alphachat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634290726757-70muhjehf23fisadhvaceic746mm5qvv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.alphachat",
+            "certificate_hash": "a55ed7b7e3f321054657054f832e5d43ccfcf3bf"
+          }
+        },
+        {
+          "client_id": "634290726757-7c2fbf29u088nuquoal5geb2v2tjalpt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_8m2uzg9h_NRs0McZqVgaY7f4d0AScxI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634290726757-7c2fbf29u088nuquoal5geb2v2tjalpt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

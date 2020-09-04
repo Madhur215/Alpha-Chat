@@ -44,7 +44,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.friendsH
     public void onBindViewHolder(@NonNull FriendsAdapter.friendsHolder holder, int position) {
         Friends friend = friendsList.get(position);
         holder.friend_name.setText(friend.getFriend_name());
-        holder.last_message.setText(friend.getLast_message());
+        try {
+            if (friend.getIsEmail())
+                holder.last_message.setText(friend.getEmail());
+            else
+                holder.last_message.setText(friend.getLast_message());
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

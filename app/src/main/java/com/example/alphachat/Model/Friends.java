@@ -6,12 +6,25 @@ public class Friends {
     private String friend_image;
     private String last_message;
     private String friend_id;
+    private String email;
+    private Boolean isEmail;
 
-    public Friends(String friend_name, String friend_image, String last_message, String friend_id) {
+    public Friends(String friend_name, String friend_image, String last_message, String friend_id, String email,
+                   Boolean isEmail) {
         this.friend_name = friend_name;
         this.friend_image = friend_image;
         this.last_message = last_message;
         this.friend_id = friend_id;
+        this.email = email;
+        this.isEmail = isEmail;
+    }
+
+    public Boolean getIsEmail(){
+        return isEmail;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getFriend_name() {

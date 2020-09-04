@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -48,63 +49,47 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users/" + PrefUtils.getUserId());
-        mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild("friends")){
-                    Log.e("SUCCESSFUL", "FRIENDS EXISTS");
-                    getFriendList();
-                }
-                else{
-                    Log.e("FAILED", "NO FRIEND ADDED");
-                    // TODO SHOW NO FRIENDS IMAGE
-                }
+                Log.e("SUCCESSFUL", "FRIENDS EXISTS");
+                getFriendList(snapshot);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.e("FAILED", "NO FRIEND ADDED");
+                // TODO SHOW NO FRIENDS IMAGE
             }
         });
     }
 
-    private void getFriendList() {
+    private void getFriendList(DataSnapshot snapshot) {
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users/" +
-                PrefUtils.getUserId() + "/friends");
-        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+        friendsAdapter = new FriendsAdapter(getFriends(snapshot));
+        friendsRecyclerView.setAdapter(friendsAdapter);
+        friendsAdapter.setOnClickListener(new FriendsAdapter.OnFriendClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                friendsAdapter = new FriendsAdapter(getFriends(snapshot));
-                friendsRecyclerView.setAdapter(friendsAdapter);
-
-                friendsAdapter.setOnClickListener(new FriendsAdapter.OnFriendClickListener() {
-                    @Override
-                    public void onFriendClick(Friends friend) {
-                        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                        intent.putExtra(ChatActivity.FRIEND_ID, friend.getFriend_id());
-                        intent.putExtra(ChatActivity.FRIEND_NAME, friend.getFriend_name());
-                        intent.putExtra(ChatActivity.FRIEND_IMAGE, friend.getFriend_image());
-                        startActivity(intent);
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, "Error fetching friends!", Toast.LENGTH_SHORT).show();
+            public void onFriendClick(Friends friend) {
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra(ChatActivity.FRIEND_ID, friend.getFriend_id());
+                intent.putExtra(ChatActivity.FRIEND_NAME, friend.getFriend_name());
+                intent.putExtra(ChatActivity.FRIEND_IMAGE, friend.getFriend_image());
+                startActivity(intent);
             }
         });
     }
 
     private List<Friends> getFriends(DataSnapshot snapshot) {
         List<Friends> list = new ArrayList<>();
-        for(DataSnapshot data : snapshot.getChildren()){
-            String name = data.child("name").getValue().toString();
-            String image = data.child("image").getValue().toString();
+        DataSnapshot friends = snapshot.child("friends");
+        for(DataSnapshot data : friends.getChildren()){
+            String name = data.child("friend_name").getValue().toString();
+            String image = data.child("friend_image").getValue().toString();
             String last_message = data.child("last_message").getValue().toString();
             String friend_id = data.child("friend_id").getValue().toString();
             String email = data.child("email").getValue().toString();
-            Friends friend = new Friends(name, image, last_message, friend_id);
+            Friends friend = new Friends(name, image, last_message, friend_id, email, false);
             list.add(friend);
         }
         return list;
@@ -115,6 +100,5 @@ public class MainActivity extends AppCompatActivity {
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         friendsRecyclerView.setHasFixedSize(true);
     }
-
 
 }

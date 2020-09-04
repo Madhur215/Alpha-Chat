@@ -114,7 +114,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            pr.SaveDetails(name, uid);
+                            pr.SaveDetails(name, uid, email, photoUrl);
                             Toast.makeText(SplashActivity.this, "Logged in!", Toast.LENGTH_SHORT).show();
                             mDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
                             mDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {

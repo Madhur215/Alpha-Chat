@@ -6,11 +6,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.alphachat.Adapter.FriendsAdapter;
 import com.example.alphachat.Model.Friends;
@@ -22,14 +23,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddFriendActivity extends AppCompatActivity {
 
-    private DatabaseReference mDatabaseReference;
-    List<Friends> friendsList = new ArrayList<>();
+    private DatabaseReference mDatabaseReference, dbRef;
+    List<Friends> friendsList;
     private ProgressBar usersProgressbar;
     RecyclerView usersRecyclerView;
 
@@ -67,11 +67,10 @@ public class AddFriendActivity extends AppCompatActivity {
                 List<Friends> allUsersList = new ArrayList<>();
                 for(DataSnapshot data : snapshot.getChildren()){
                     String name = data.child("name").getValue().toString();
-                    Log.e("USER NAME: ", name);
                     String image = data.child("image").getValue().toString();
                     String uid = data.child("uid").getValue().toString();
                     String email = data.child("email").getValue().toString();
-                    allUsersList.add(new Friends(name, image, email, uid));
+                    allUsersList.add(new Friends(name, image, null, uid, email, true));
                 }
                 filterUsers(allUsersList, query);
             }
@@ -86,8 +85,9 @@ public class AddFriendActivity extends AppCompatActivity {
     private void filterUsers(List<Friends> allUsersList, String query) {
         for(Friends user : allUsersList){
             if((user.getFriend_name().toLowerCase().contains(query) ||
-                    user.getLast_message().toLowerCase().contains(query)) &&
+                    user.getEmail().toLowerCase().contains(query)) &&
                     !user.getFriend_id().equals(PrefUtils.getUserId())){
+                friendsList = new ArrayList<>();
                 friendsList.add(user);
                 FriendsAdapter mAdapter = new FriendsAdapter(friendsList);
                 usersRecyclerView.setAdapter(mAdapter);
@@ -102,9 +102,62 @@ public class AddFriendActivity extends AppCompatActivity {
         usersProgressbar.setVisibility(View.GONE);
     }
 
-    private void addUsersToFriendList(Friends friend) {
+    private void addUsersToFriendList(final Friends friend) {
+        dbRef = FirebaseDatabase.getInstance().getReference("/users/" + PrefUtils.getUserId());
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // TODO Add user to friend's friends list also
+                if(!alreadyFriends(friend, snapshot)) {
+                    Friends fr = new Friends(
+                            friend.getFriend_name(),
+                            friend.getFriend_image(),
+                            "No messages yet",
+                            friend.getFriend_id(),
+                            friend.getEmail(),
+                            false
+                    );
+                    dbRef.child("friends").push().setValue(fr);
+                    addToFriendList(friend);
+                    Toast.makeText(AddFriendActivity.this, friend.getFriend_name() + " added as friend",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(AddFriendActivity.this, "Already added as friend!", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AddFriendActivity.this, "An error occurred!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
+    // Method to add the logged in user to friend list of the user added as friend of the current user
+    private void addToFriendList(Friends friend) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/users/" +
+                friend.getFriend_id());
+        Friends currentUser = new Friends(
+                PrefUtils.getUserFullName(),
+                PrefUtils.getUserImage(),
+                "No messages yet",
+                PrefUtils.getUserId(),
+                PrefUtils.getUserEmail(),
+                false
+        );
+        ref.child("friends").push().setValue(currentUser);
+    }
 
+    private boolean alreadyFriends(Friends friend, DataSnapshot snapshot) {
+        if(!snapshot.hasChild("friends")){
+            return false;
+        }
+        DataSnapshot friends = snapshot.child("friends");
+        for(DataSnapshot fr : friends.getChildren()){
+            if(fr.child("friend_id").getValue().toString().equals(friend.getFriend_id()))
+                return true;
+        }
+        return false;
     }
 
 }

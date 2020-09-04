@@ -125,6 +125,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                                         mDatabaseReference.child(uid + "/" + "name").setValue(name);
                                         mDatabaseReference.child(uid + "/" + "image").setValue(photoUrl);
                                         mDatabaseReference.child(uid + "/" + "uid").setValue(uid);
+                                        mDatabaseReference.child(uid + "/" + "email").setValue(email);
                                     }
                                 }
 

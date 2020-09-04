@@ -20,10 +20,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.friendsH
     private List<Friends> friendsList;
     private OnFriendClickListener mListener;
 
-    public FriendsAdapter(){
-    }
-
-    public void setFriendsList(List<Friends> friendsList){
+    public FriendsAdapter(List<Friends> friendsList){
         this.friendsList = friendsList;
     }
 

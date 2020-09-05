@@ -2,6 +2,7 @@ package com.example.alphachat.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +46,11 @@ public class AddFriendActivity extends AppCompatActivity {
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         usersRecyclerView.setHasFixedSize(true);
         usersProgressbar.setVisibility(View.GONE);
+        Toolbar toolbar = findViewById(R.id.toolbar_add_friend);
+        toolbar.setTitle("Add Friends");
+        setSupportActionBar(toolbar);
+
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -107,7 +113,6 @@ public class AddFriendActivity extends AppCompatActivity {
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // TODO Add user to friend's friends list also
                 if(!alreadyFriends(friend, snapshot)) {
                     Friends fr = new Friends(
                             friend.getFriend_name(),

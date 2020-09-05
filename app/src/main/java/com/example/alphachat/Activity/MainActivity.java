@@ -2,6 +2,7 @@ package com.example.alphachat.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private RecyclerView friendsRecyclerView;
     private FriendsAdapter friendsAdapter;
-    private ChildEventListener mChildEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddFriendActivity.class));
             }
         });
+
+        Toolbar toolbar = findViewById(R.id.toolbar_main_activity);
+        setSupportActionBar(toolbar);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users/" + PrefUtils.getUserId());
         mDatabaseReference.addValueEventListener(new ValueEventListener() {

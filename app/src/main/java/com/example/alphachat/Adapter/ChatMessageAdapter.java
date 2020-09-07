@@ -2,6 +2,7 @@ package com.example.alphachat.Adapter;
 
 import android.content.Context;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.alphachat.Model.Message;
 import com.example.alphachat.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ChatMessageAdapter extends RecyclerView.Adapter {
+public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder> {
 
     private List<Message> messageList;
     private String friend_id;
@@ -24,9 +26,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
     public ChatMessageAdapter(List<Message> messageList, String friend_id, Context context){
-        this.messageList = messageList;
         this.friend_id = friend_id;
         this.context = context;
+        this.messageList = messageList;
     }
 
     @Override
@@ -37,14 +39,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
         return VIEW_TYPE_MESSAGE_SENT;
     }
 
-    public void addMessage(Message message){
-        messageList.add(message);
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatMessageAdapter.MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if(viewType == VIEW_TYPE_MESSAGE_SENT){
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_sent,
@@ -58,15 +55,16 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChatMessageAdapter.MessageViewHolder holder, int position) {
         Message message = messageList.get(position);
-        ((MessageViewHolder)holder).setTexts(message);
+        holder.message_text_view.setText(message.getMessage());
+        holder.time_text_view.setText(message.getTimestamp());
     }
 
     @Override
     public int getItemCount() {
         try{
-            messageList.size();
+            return messageList.size();
         }
         catch (NullPointerException e){
             e.printStackTrace();
@@ -84,11 +82,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter {
             message_text_view = itemView.findViewById(R.id.text_message_body);
             time_text_view = itemView.findViewById(R.id.text_message_time);
         }
-
-        void setTexts(Message message){
-            message_text_view.setText(message.getMessage());
-            time_text_view.setText(message.getTimestamp());
-        }
-
     }
+
 }

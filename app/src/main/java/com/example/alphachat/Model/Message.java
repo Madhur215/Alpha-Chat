@@ -2,10 +2,10 @@ package com.example.alphachat.Model;
 
 public class Message {
 
-    String sender_id;
-    String receiver_id;
-    String message;
-    String timestamp;
+    private String sender_id;
+    private String receiver_id;
+    private String message;
+    private String timestamp;
 
     public Message(String sender_id, String receiver_id, String message, String timestamp) {
         this.sender_id = sender_id;
@@ -13,6 +13,8 @@ public class Message {
         this.message = message;
         this.timestamp = timestamp;
     }
+
+    public Message(){}
 
     public void setSender_id(String sender_id) {
         this.sender_id = sender_id;

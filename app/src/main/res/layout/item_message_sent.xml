@@ -10,12 +10,13 @@
 
     <TextView
         android:id="@+id/text_message_body"
-        android:text="hello, hello!"
-        android:background="@drawable/chat_bubble_background"
+        android:text="h!"
+        android:background="@drawable/chat_bubble_message_sent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="240dp"
         android:padding="8dp"
+        android:minWidth="80dp"
         android:textColor="#ffffff"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"

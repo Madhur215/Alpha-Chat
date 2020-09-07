@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.alphachat.Adapter.FriendsAdapter;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private RecyclerView friendsRecyclerView;
     private FriendsAdapter friendsAdapter;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddFriendActivity.class));
             }
         });
-
         Toolbar toolbar = findViewById(R.id.toolbar_main_activity);
         setSupportActionBar(toolbar);
+        progressBar = findViewById(R.id.main_activity_progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users/" + PrefUtils.getUserId());
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         friendsAdapter = new FriendsAdapter(getFriends(snapshot));
         friendsRecyclerView.setAdapter(friendsAdapter);
+        progressBar.setVisibility(View.GONE);
         friendsAdapter.setOnClickListener(new FriendsAdapter.OnFriendClickListener() {
             @Override
             public void onFriendClick(Friends friend) {

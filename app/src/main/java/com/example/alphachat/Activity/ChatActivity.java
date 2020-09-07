@@ -88,6 +88,7 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                messageRecyclerView.scrollToPosition(messageAdapter.getItemCount()-1);
                 if(s.toString().trim().length() > 0){
                     send_button.setEnabled(true);
                 } else {
@@ -127,6 +128,7 @@ public class ChatActivity extends AppCompatActivity {
                 Message message = snapshot.getValue(Message.class);
                 messageList.add(message);
                 messageAdapter.notifyDataSetChanged();
+                messageRecyclerView.scrollToPosition(messageAdapter.getItemCount()-1);
             }
 
             @Override

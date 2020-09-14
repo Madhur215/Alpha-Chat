@@ -81,6 +81,28 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 startActivityForResult(intent, RC_SIGN_IN);
             }
         });
+
+        if (getIntent().getStringExtra("mode") != null) {
+            if (getIntent().getStringExtra("mode").equals("logout")) {
+                googleApiClient.connect();
+                googleApiClient
+                        .registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                            @Override
+                            public void onConnected(@Nullable Bundle bundle) {
+                                mFirebaseAuth.signOut();
+                                Auth.GoogleSignInApi.signOut(googleApiClient);
+                                startActivity(new Intent(SplashActivity.this, SplashActivity.class));
+                            }
+
+                            @Override
+                            public void onConnectionSuspended(int i) {
+
+                            }
+                        });
+            }
+        }
+
+
     }
 
     @Override
@@ -163,6 +185,8 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
+
+
         FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
         if(currentUser != null){
             startActivity(new Intent(SplashActivity.this, MainActivity.class));

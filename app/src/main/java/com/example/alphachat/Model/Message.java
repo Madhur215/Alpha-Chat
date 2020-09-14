@@ -6,15 +6,25 @@ public class Message {
     private String receiver_id;
     private String message;
     private String timestamp;
+    private String date;
 
-    public Message(String sender_id, String receiver_id, String message, String timestamp) {
+    public Message(String sender_id, String receiver_id, String message, String timestamp, String date) {
         this.sender_id = sender_id;
         this.receiver_id = receiver_id;
         this.message = message;
         this.timestamp = timestamp;
+        this.date = date;
     }
 
     public Message(){}
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public void setSender_id(String sender_id) {
         this.sender_id = sender_id;

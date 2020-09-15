@@ -62,13 +62,11 @@ public class MainActivity extends AppCompatActivity {
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.e("SUCCESSFUL", "FRIENDS EXISTS");
                 getFriendList(snapshot);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("FAILED", "NO FRIEND ADDED");
                 // TODO SHOW NO FRIENDS IMAGE
             }
         });

@@ -92,6 +92,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                                 mFirebaseAuth.signOut();
                                 Auth.GoogleSignInApi.signOut(googleApiClient);
                                 startActivity(new Intent(SplashActivity.this, SplashActivity.class));
+                                finish();
                             }
 
                             @Override

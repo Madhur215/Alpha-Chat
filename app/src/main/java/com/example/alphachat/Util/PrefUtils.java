@@ -13,6 +13,7 @@ public class PrefUtils {
     private static String USER_FULL_NAME = "user_name";
     private static String USER_IMAGE = "image";
     private static String USER_EMAIL = "email";
+    public static String LAST_MESSAGE_DATE = "99/99/9999";
 
     public PrefUtils(Context context){
         this.context = context;

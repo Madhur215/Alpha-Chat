@@ -25,15 +25,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context context;
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
-    private static final int VIEW_TYPE_DATE_CHANGED_MESSAGE_SENT = 3;
-    private static final int VIEW_TYPE_DATE_CHANGED_MESSAGE_RECEIVED = 4;
-    private String LAST_DATE;
 
     public ChatMessageAdapter(List<Message> messageList, String friend_id, Context context){
         this.friend_id = friend_id;
         this.context = context;
         this.messageList = messageList;
-        LAST_DATE = "99/99/9999";
     }
 
     @Override
@@ -50,11 +46,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if(viewType == VIEW_TYPE_MESSAGE_SENT){
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_date_changed_message_sent,
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_sent,
                     parent, false);
         }
         else{
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_date_changed_message_received,
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_received,
                     parent, false);
         }
         return new MessageViewHolder(view);
@@ -63,14 +59,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messageList.get(position);
-        if (message.getDate().equals(PrefUtils.LAST_MESSAGE_DATE) ||
-                PrefUtils.LAST_MESSAGE_DATE.equals("99/99/9999")) {
-            ((MessageViewHolder) holder).date_text_view.setVisibility(View.GONE);
-        }
-        else{
-            ((MessageViewHolder)holder).date_text_view.setText(PrefUtils.LAST_MESSAGE_DATE);
-        }
-        PrefUtils.LAST_MESSAGE_DATE = message.getDate();
         ((MessageViewHolder)holder).setTexts(message);
     }
 
@@ -89,19 +77,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         private TextView message_text_view;
         private TextView time_text_view;
-        private TextView date_text_view;
 
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             message_text_view = itemView.findViewById(R.id.text_message_body);
             time_text_view = itemView.findViewById(R.id.text_message_time);
-            date_text_view = itemView.findViewById(R.id.date_text_view);
         }
 
         private void setTexts(Message message) {
             message_text_view.setText(message.getMessage());
-            time_text_view.setText(message.getTimestamp());
+            String dateTime = message.getTimestamp() + ", " + message.getDate();
+            time_text_view.setText(dateTime);
         }
 
     }

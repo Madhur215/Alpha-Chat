@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -30,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
@@ -49,6 +51,8 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mChildEventListener;
     private DatabaseReference mDatabaseReference;
+
+    private HashMap<Integer, String> months = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,20 @@ public class ChatActivity extends AppCompatActivity {
 
         fetchMessages(this);
 
+
+        months.put(1, "Jan");
+        months.put(2, "Feb");
+        months.put(3, "Mar");
+        months.put(4, "Apr");
+        months.put(5, "May");
+        months.put(6, "Jun");
+        months.put(7, "Jul");
+        months.put(8, "Aug");
+        months.put(9, "Sep");
+        months.put(10, "Oct");
+        months.put(11, "Nov");
+        months.put(12, "Dec");
+
         send_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                messageRecyclerView.scrollToPosition(messageAdapter.getItemCount()-1);
             }
 
             @Override
@@ -169,13 +187,12 @@ public class ChatActivity extends AppCompatActivity {
     private void setTimeAndDate(){
         Calendar calendar = Calendar.getInstance();
         String day = Integer.toString(calendar.get(Calendar.DATE));
-        String month = Integer.toString(calendar.get(Calendar.MONTH));
+        String month = months.get(calendar.get(Calendar.MONTH) + 1);
         String year = Integer.toString(calendar.get(Calendar.YEAR));
+        year = String.valueOf(year.charAt(2)) + year.charAt(3);
         if(day.length() == 1)
             day = "0" + day;
-        if(month.length() == 1)
-            month = "0" + month;
-        DATE = day + "/" + month + "/" + year;
+        DATE = day + " " + month + " " + year;
         String hour = Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
         String minute = Integer.toString(calendar.get(Calendar.MINUTE));
         if(minute.length() == 1){

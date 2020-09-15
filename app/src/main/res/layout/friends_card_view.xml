@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -11,15 +12,31 @@
         android:paddingBottom="12dp">
 
 
-        <de.hdodenhof.circleimageview.CircleImageView
+<!--        <de.hdodenhof.circleimageview.CircleImageView-->
+<!--            android:id="@+id/friend_image"-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:src="@drawable/no_image"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/friend_image"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/no_image"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            fresco:placeholderImage="@drawable/no_image"
+            fresco:roundBottomLeft="true"
+            fresco:roundBottomRight="true"
+            fresco:roundTopLeft="true"
+            fresco:roundTopRight="true"
+            fresco:roundedCornerRadius="8dp"
+            tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/friend_name_text_view"

@@ -1,11 +1,13 @@
 package com.example.alphachat.Adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -59,7 +61,16 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messageList.get(position);
-        ((MessageViewHolder)holder).setTexts(message);
+        if(message.getPhotoUrl() == null){
+            ((MessageViewHolder)holder).photo_image_view.setVisibility(View.GONE);
+            ((MessageViewHolder)holder).setTexts(message);
+        }
+        else{
+            ((MessageViewHolder)holder).photo_image_view.setImageURI(Uri.parse(message.getPhotoUrl()));
+            String dateTime = message.getTimestamp() + ", " + message.getDate();
+            ((MessageViewHolder)holder).message_text_view.setVisibility(View.GONE);
+            ((MessageViewHolder)holder).time_text_view.setText(dateTime);
+        }
     }
 
     @Override
@@ -77,12 +88,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         private TextView message_text_view;
         private TextView time_text_view;
+        private ImageView photo_image_view;
 
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             message_text_view = itemView.findViewById(R.id.text_message_body);
             time_text_view = itemView.findViewById(R.id.text_message_time);
+            photo_image_view = itemView.findViewById(R.id.photoImageView);
         }
 
         private void setTexts(Message message) {

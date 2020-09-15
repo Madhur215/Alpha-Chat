@@ -21,6 +21,7 @@ import com.example.alphachat.Adapter.FriendsAdapter;
 import com.example.alphachat.Model.Friends;
 import com.example.alphachat.R;
 import com.example.alphachat.Util.PrefUtils;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         setRecyclerView();
         FloatingActionButton fab = findViewById(R.id.add_friends_fab);

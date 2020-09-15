@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -23,11 +25,18 @@ import com.example.alphachat.Adapter.ChatMessageAdapter;
 import com.example.alphachat.Model.Message;
 import com.example.alphachat.R;
 import com.example.alphachat.Util.PrefUtils;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,6 +49,7 @@ public class ChatActivity extends AppCompatActivity {
     public static final String FRIEND_NAME = "friend name";
     public static final String FRIEND_IMAGE = "image";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
+    private static final int RC_PHOTO_PICKER =  105;
     private String DATE, TIME;
 
     private ChatMessageAdapter messageAdapter;
@@ -47,16 +57,19 @@ public class ChatActivity extends AppCompatActivity {
     private List<Message> messageList = new ArrayList<>();
     private EditText messageEditText;
     private ImageButton send_button;
+    private ImageButton select_image;
 
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mChildEventListener;
     private DatabaseReference mDatabaseReference;
+    private StorageReference mStorageReference;
 
     private HashMap<Integer, String> months = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(this);
         setContentView(R.layout.activity_chat);
         Toolbar chat_toolbar = findViewById(R.id.chat_toolbar);
         setSupportActionBar(chat_toolbar);
@@ -67,8 +80,10 @@ public class ChatActivity extends AppCompatActivity {
         send_button = findViewById(R.id.send_message_image);
         messageRecyclerView = findViewById(R.id.recycler_view_messages);
         messageEditText = findViewById(R.id.message_edit_text);
+        select_image = findViewById(R.id.send_image_chat);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mStorageReference = FirebaseStorage.getInstance().getReference().child("photos");
         init();
         setEditText();
 
@@ -89,6 +104,16 @@ public class ChatActivity extends AppCompatActivity {
         months.put(11, "Nov");
         months.put(12, "Dec");
 
+        select_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"),
+                        RC_PHOTO_PICKER);
+            }
+        });
         send_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,7 +204,7 @@ public class ChatActivity extends AppCompatActivity {
         Message message = new Message(PrefUtils.getUserId(),
                                         getIntent().getStringExtra(FRIEND_ID),
                                         messageEditText.getText().toString().trim(),
-                                        TIME, DATE);
+                                        TIME, DATE, null);
         mDatabaseReference.push().setValue(message);
         messageEditText.setText("");
     }
@@ -211,6 +236,38 @@ public class ChatActivity extends AppCompatActivity {
         if(mChildEventListener != null){
             mDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode == RC_PHOTO_PICKER){
+            Uri selectedImage = data.getData();
+            final StorageReference ref = mStorageReference.child(selectedImage.getLastPathSegment());
+            ref.putFile(selectedImage).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return ref.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Message message = new Message(PrefUtils.getUserId(),
+                                                        getIntent().getStringExtra(FRIEND_ID),
+                                                        null,
+                                                        TIME, DATE, downloadUri.toString());
+                        mDatabaseReference.push().setValue(message);
+                    }
+                }
+            });
         }
     }
 }

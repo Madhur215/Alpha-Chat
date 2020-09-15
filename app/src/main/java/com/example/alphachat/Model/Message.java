@@ -7,16 +7,23 @@ public class Message {
     private String message;
     private String timestamp;
     private String date;
+    private String photoUrl;
 
-    public Message(String sender_id, String receiver_id, String message, String timestamp, String date) {
+    public Message(String sender_id, String receiver_id, String message, String timestamp,
+                   String date, String photoUrl) {
         this.sender_id = sender_id;
         this.receiver_id = receiver_id;
         this.message = message;
         this.timestamp = timestamp;
         this.date = date;
+        this.photoUrl = photoUrl;
     }
 
     public Message(){}
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
 
     public String getDate() {
         return date;

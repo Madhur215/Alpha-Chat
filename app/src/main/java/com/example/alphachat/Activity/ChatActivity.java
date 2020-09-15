@@ -37,12 +37,12 @@ public class ChatActivity extends AppCompatActivity {
     public static final String FRIEND_ID = "friend";
     public static final String FRIEND_NAME = "friend name";
     public static final String FRIEND_IMAGE = "image";
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
+    public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
+    private String DATE, TIME;
 
     private ChatMessageAdapter messageAdapter;
     private RecyclerView messageRecyclerView;
     private List<Message> messageList = new ArrayList<>();
-    private String PUSH_ID;
     private EditText messageEditText;
     private ImageButton send_button;
 
@@ -108,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
     private void init() {
         String uid1 = PrefUtils.getUserId();
         String uid2 = getIntent().getStringExtra(FRIEND_ID);
+        String PUSH_ID;
         if(uid1.compareTo(uid2) > 0) PUSH_ID = uid2 + uid1;
         else PUSH_ID = uid1 + uid2;
 
@@ -156,27 +157,40 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessage() {
 
+        setTimeAndDate();
         Message message = new Message(PrefUtils.getUserId(),
                                         getIntent().getStringExtra(FRIEND_ID),
                                         messageEditText.getText().toString().trim(),
-                                        getTime());
+                                        TIME, DATE);
         mDatabaseReference.push().setValue(message);
         messageEditText.setText("");
     }
 
-    private String getTime(){
+    private void setTimeAndDate(){
         Calendar calendar = Calendar.getInstance();
-        String hour = Integer.toString(calendar.get(Calendar.HOUR));
+        String day = Integer.toString(calendar.get(Calendar.DATE));
+        String month = Integer.toString(calendar.get(Calendar.MONTH));
+        String year = Integer.toString(calendar.get(Calendar.YEAR));
+        if(day.length() == 1)
+            day = "0" + day;
+        if(month.length() == 1)
+            month = "0" + month;
+        DATE = day + "/" + month + "/" + year;
+        String hour = Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
         String minute = Integer.toString(calendar.get(Calendar.MINUTE));
         if(minute.length() == 1){
             minute = "0" + minute;
         }
-        return hour + ":" + minute;
+        if(hour.length() == 1){
+            hour = "0" + hour;
+        }
+        TIME = hour + ":" + minute;
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        PrefUtils.LAST_MESSAGE_DATE = "99/99/9999";
         if(mChildEventListener != null){
             mDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;

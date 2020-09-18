@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,61 +9,82 @@
     tools:context=".Activity.ChatActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chat_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/chat_activity_friend_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        fresco:placeholderImage="@drawable/no_image"
+        fresco:roundBottomLeft="true"
+        fresco:roundBottomRight="true"
+        fresco:roundTopLeft="true"
+        fresco:roundTopRight="true"
+        fresco:roundedCornerRadius="50dp"
+        tools:ignore="MissingConstraints" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/chat_activity_friend_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/no_image"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/chat_activity_friend_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Friend Name"
-                android:textColor="#FFF"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toBottomOf="@+id/chat_activity_friend_image"
-                app:layout_constraintStart_toEndOf="@+id/chat_activity_friend_image"
-                app:layout_constraintTop_toTopOf="@+id/chat_activity_friend_image" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.appcompat.widget.Toolbar>
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/chat_toolbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@color/colorPrimary"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
+
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:padding="8dp">-->
+
+<!--            <de.hdodenhof.circleimageview.CircleImageView-->
+<!--                android:id="@+id/chat_activity_friend_image"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:src="@drawable/no_image"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/chat_activity_friend_name"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="16dp"-->
+<!--                android:text="Friend Name"-->
+<!--                android:textColor="#FFF"-->
+<!--                android:textSize="22sp"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/chat_activity_friend_image"-->
+<!--                app:layout_constraintStart_toEndOf="@+id/chat_activity_friend_image"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/chat_activity_friend_image" />-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--    </androidx.appcompat.widget.Toolbar>-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_messages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="6dp"
         app:layout_constraintBottom_toTopOf="@+id/message_edit_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_toolbar"
-        android:paddingBottom="6dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/chat_activity_friend_image" />
 
 
-    <ImageButton
-        android:id="@+id/send_image_chat"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/add_image_icon" />
+<!--    <ImageButton-->
+<!--        android:id="@+id/send_image_chat"-->
+<!--        android:layout_width="40dp"-->
+<!--        android:layout_height="40dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:srcCompat="@drawable/add_image_icon" />-->
+
 
     <EditText
         android:id="@+id/message_edit_text"
@@ -75,12 +97,53 @@
         app:layout_constraintEnd_toStartOf="@+id/send_message_image"
         app:layout_constraintStart_toEndOf="@+id/send_image_chat" />
 
-    <ImageButton
+<!--    <ImageButton-->
+<!--        android:id="@+id/send_message_image"-->
+<!--        android:layout_width="40dp"-->
+<!--        android:layout_height="40dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:srcCompat="@drawable/send_message_icon" />-->
+
+    <TextView
+        android:id="@+id/chat_activity_friend_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/josefin_sans_semibold"
+        android:text="TextView"
+        android:textColor="#000"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/chat_activity_friend_image"
+        app:layout_constraintTop_toTopOf="@+id/chat_activity_friend_image" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/josefin_sans_semibold"
+        android:text="Last seen at 4pm"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_activity_friend_image"
+        app:layout_constraintStart_toStartOf="@+id/chat_activity_friend_name" />
+
+    <ImageView
+        android:id="@+id/send_image_chat"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/message_edit_text"
+        fresco:srcCompat="@drawable/gallery" />
+
+    <ImageView
         android:id="@+id/send_message_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/send_message_icon" />
+        app:layout_constraintTop_toBottomOf="@+id/recycler_view_messages"
+        fresco:srcCompat="@drawable/send" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

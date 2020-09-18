@@ -4,7 +4,7 @@
 
     <!-- View background color -->
     <solid
-        android:color="#FAC609" >
+        android:color="#5CE27F" >
     </solid>
 
     <!-- The radius makes the corners rounded -->

@@ -20,7 +20,7 @@ import com.example.alphachat.Util.PrefUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder> {
 
     private List<Message> messageList;
     private String friend_id;
@@ -45,7 +45,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatMessageAdapter.MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if(viewType == VIEW_TYPE_MESSAGE_SENT){
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_sent,
@@ -59,18 +59,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChatMessageAdapter.MessageViewHolder holder, int position) {
         Message message = messageList.get(position);
         if(message.getPhotoUrl() == null){
-            ((MessageViewHolder)holder).photo_image_view.setVisibility(View.GONE);
-            ((MessageViewHolder)holder).setTexts(message);
+            holder.photo_image_view.setVisibility(View.GONE);
+            holder.setTexts(message);
         }
         else{
-            ((MessageViewHolder)holder).photo_image_view.setImageURI(Uri.parse(message.getPhotoUrl()));
+            holder.photo_image_view.setImageURI(Uri.parse(message.getPhotoUrl()));
             String dateTime = message.getTimestamp() + ", " + message.getDate();
-            ((MessageViewHolder)holder).message_text_view.setVisibility(View.GONE);
-            ((MessageViewHolder)holder).time_text_view.setText(dateTime);
+            holder.message_text_view.setVisibility(View.GONE);
+            holder.time_text_view.setText(dateTime);
         }
+        holder.setIsRecyclable(false);
     }
 
     @Override

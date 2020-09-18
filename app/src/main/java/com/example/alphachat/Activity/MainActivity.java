@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -48,15 +49,22 @@ public class MainActivity extends AppCompatActivity {
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         setRecyclerView();
-        FloatingActionButton fab = findViewById(R.id.add_friends_fab);
+        ImageView fab = findViewById(R.id.add_friend_image);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, AddFriendActivity.class));
             }
         });
-        Toolbar toolbar = findViewById(R.id.toolbar_main_activity);
-        setSupportActionBar(toolbar);
+
+        ImageView profile_image = findViewById(R.id.profile_image);
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                profile();
+            }
+        });
+
         progressBar = findViewById(R.id.main_activity_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -72,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
                 // TODO SHOW NO FRIENDS IMAGE
             }
         });
+    }
+
+    private void profile() {
+        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+        intent.putExtra("mode", "logout");
+        startActivity(intent);
+        finish();
     }
 
     private void getFriendList(DataSnapshot snapshot) {
@@ -110,25 +125,6 @@ public class MainActivity extends AppCompatActivity {
         friendsRecyclerView = findViewById(R.id.friends_recycler_view);
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         friendsRecyclerView.setHasFixedSize(true);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.logout, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.logout_menu){
-            Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-            intent.putExtra("mode", "logout");
-            startActivity(intent);
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 }

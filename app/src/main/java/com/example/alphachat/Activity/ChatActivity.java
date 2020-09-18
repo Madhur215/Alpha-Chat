@@ -56,8 +56,8 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView messageRecyclerView;
     private List<Message> messageList = new ArrayList<>();
     private EditText messageEditText;
-    private ImageButton send_button;
-    private ImageButton select_image;
+    private ImageView send_button;
+    private ImageView select_image;
 
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mChildEventListener;
@@ -71,11 +71,10 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_chat);
-        Toolbar chat_toolbar = findViewById(R.id.chat_toolbar);
-        setSupportActionBar(chat_toolbar);
 
         TextView friend_name_text_view = findViewById(R.id.chat_activity_friend_name);
         ImageView friend_image_view = findViewById(R.id.chat_activity_friend_image);
+        friend_image_view.setImageURI(Uri.parse(getIntent().getStringExtra(FRIEND_IMAGE)));
         friend_name_text_view.setText(getIntent().getStringExtra(FRIEND_NAME));
         send_button = findViewById(R.id.send_message_image);
         messageRecyclerView = findViewById(R.id.recycler_view_messages);
@@ -86,8 +85,6 @@ public class ChatActivity extends AppCompatActivity {
         mStorageReference = FirebaseStorage.getInstance().getReference().child("photos");
         init();
         setEditText();
-
-
         fetchMessages(this);
 
 
@@ -199,6 +196,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
+
+        if(messageEditText.getText().toString().trim().length() == 0)
+            return;
 
         setTimeAndDate();
         Message message = new Message(PrefUtils.getUserId(),

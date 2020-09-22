@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.example.alphachat.Adapter.ChatMessageAdapter;
 import com.example.alphachat.Model.Message;
 import com.example.alphachat.R;
+import com.example.alphachat.Util.AES;
 import com.example.alphachat.Util.PrefUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.tasks.Continuation;
@@ -52,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final int RC_PHOTO_PICKER =  105;
     private String DATE, TIME;
 
+    private AES aes;
     private ChatMessageAdapter messageAdapter;
     private RecyclerView messageRecyclerView;
     private List<Message> messageList = new ArrayList<>();
@@ -81,6 +83,7 @@ public class ChatActivity extends AppCompatActivity {
         messageEditText = findViewById(R.id.message_edit_text);
         select_image = findViewById(R.id.send_image_chat);
 
+        aes = new AES(this);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mStorageReference = FirebaseStorage.getInstance().getReference().child("photos");
         init();
@@ -167,7 +170,14 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Message message = snapshot.getValue(Message.class);
-                messageList.add(message);
+                if(message.getPhotoUrl() == null) {
+                    String decryptedMessage = aes.Decrypt(message.getMessage(), context);
+                    messageList.add(new Message(message.getSender_id(), message.getReceiver_id(), decryptedMessage,
+                            message.getTimestamp(), message.getDate(), message.getPhotoUrl()));
+                }
+                else{
+                    messageList.add(message);
+                }
                 messageAdapter.notifyDataSetChanged();
                 messageRecyclerView.scrollToPosition(messageAdapter.getItemCount()-1);
             }
@@ -201,9 +211,10 @@ public class ChatActivity extends AppCompatActivity {
             return;
 
         setTimeAndDate();
+        String encryptedMessage = aes.Encrypt(messageEditText.getText().toString().trim(), this);
         Message message = new Message(PrefUtils.getUserId(),
                                         getIntent().getStringExtra(FRIEND_ID),
-                                        messageEditText.getText().toString().trim(),
+                                        encryptedMessage,
                                         TIME, DATE, null);
         mDatabaseReference.push().setValue(message);
         messageEditText.setText("");

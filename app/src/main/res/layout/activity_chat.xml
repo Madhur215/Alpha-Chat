@@ -11,8 +11,8 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/chat_activity_friend_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,6 +21,8 @@
         fresco:roundBottomLeft="true"
         fresco:roundBottomRight="true"
         fresco:roundTopLeft="true"
+        android:fitsSystemWindows="true"
+        android:adjustViewBounds="true"
         fresco:roundTopRight="true"
         fresco:roundedCornerRadius="50dp"
         tools:ignore="MissingConstraints" />
@@ -69,7 +71,7 @@
         android:id="@+id/recycler_view_messages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:paddingBottom="6dp"
         app:layout_constraintBottom_toTopOf="@+id/message_edit_text"
         app:layout_constraintEnd_toEndOf="parent"

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.alphachat.Adapter.FriendsAdapter;
 import com.example.alphachat.Model.Friends;
 import com.example.alphachat.R;
+import com.example.alphachat.Util.AES;
 import com.example.alphachat.Util.PrefUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.ui.auth.AuthUI;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView friendsRecyclerView;
     private FriendsAdapter friendsAdapter;
     private ProgressBar progressBar;
+    private ImageView no_friends_image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setRecyclerView();
         ImageView fab = findViewById(R.id.add_friend_image);
+        no_friends_image = findViewById(R.id.no_friends_bg);
+        no_friends_image.setVisibility(View.GONE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFriendList(DataSnapshot snapshot) {
 
-        friendsAdapter = new FriendsAdapter(getFriends(snapshot));
+        List<Friends> friendsList = getFriends(snapshot);
+        friendsAdapter = new FriendsAdapter(friendsList);
         friendsRecyclerView.setAdapter(friendsAdapter);
         progressBar.setVisibility(View.GONE);
         friendsAdapter.setOnClickListener(new FriendsAdapter.OnFriendClickListener() {
@@ -104,6 +109,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        if(friendsList.size() == 0){
+            no_friends_image.setVisibility(View.VISIBLE);
+        }
+        else{
+            no_friends_image.setVisibility(View.GONE);
+        }
+
     }
 
     private List<Friends> getFriends(DataSnapshot snapshot) {

@@ -72,4 +72,16 @@
         app:layout_constraintEnd_toStartOf="@+id/add_friend_image"
         app:layout_constraintTop_toTopOf="@+id/add_friend_image"
         app:srcCompat="@drawable/search" />
+
+    <ImageView
+        android:id="@+id/no_friends_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/friends_recycler_view"
+        app:srcCompat="@drawable/no_friends_bg"
+        android:fitsSystemWindows="true"
+        android:adjustViewBounds="true"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

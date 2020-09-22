@@ -46,9 +46,6 @@ public class AddFriendActivity extends AppCompatActivity {
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         usersRecyclerView.setHasFixedSize(true);
         usersProgressbar.setVisibility(View.GONE);
-        Toolbar toolbar = findViewById(R.id.toolbar_add_friend);
-        toolbar.setTitle("Add Friends");
-        setSupportActionBar(toolbar);
 
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

@@ -10,15 +10,6 @@
     android:paddingTop="8dp"
     android:paddingLeft="8dp">
 
-<!--    <ImageView-->
-<!--        android:id="@+id/photoImageView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:adjustViewBounds="true"-->
-<!--        android:maxWidth="600dp"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/photoImageView"
         android:layout_width="match_parent"

@@ -13,8 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Activity.ChatActivity"/>
-        <activity android:name=".Activity.AddFriendActivity" />
-        <activity android:name=".Activity.SplashActivity">
+        <activity android:name=".Activity.SplashActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -37,38 +37,6 @@ public class AES {
         secretKeySpec = new SecretKeySpec(encryptionKey, "AES");
     }
 
-//    public String Encrypt(String message, Context context) {
-//
-//        byte[] bytes = message.getBytes();
-//        byte[] encryptedBytes = new byte[bytes.length];
-//        try {
-//            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-//            encryptedBytes = cipher.doFinal(bytes);
-//        }
-//        catch(Exception e){
-//            e.printStackTrace();
-//            Toast.makeText(context, "Encryption Error!", Toast.LENGTH_SHORT).show();
-//        }
-//        return new String(encryptedBytes, StandardCharsets.ISO_8859_1);
-//    }
-//
-//    public String Decrypt(String encryptedMessage, Context context){
-//        byte[] encryptedByte = encryptedMessage.getBytes(StandardCharsets.ISO_8859_1);
-//        String message = encryptedMessage;
-//        byte[] decryption;
-//        try{
-//            deCipher.init(cipher.DECRYPT_MODE, secretKeySpec);
-//            decryption = deCipher.doFinal(encryptedByte);
-//            message = new String(decryption, StandardCharsets.ISO_8859_1);
-//        }
-//        catch (Exception e){
-//            e.printStackTrace();
-//            Toast.makeText(context, "Decryption Error!", Toast.LENGTH_SHORT).show();
-//        }
-//        return message;
-//    }
-
-
     public String Encrypt(String string, Context context){
 
         byte[] stringByte = string.getBytes();

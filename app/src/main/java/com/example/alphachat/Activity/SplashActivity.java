@@ -103,7 +103,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
             }
         }
 
-
     }
 
     @Override
@@ -175,7 +174,8 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                             finish();
                         }
                         else{
-                            Toast.makeText(SplashActivity.this, "Authentication Failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SplashActivity.this, "Authentication Failed!",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -186,7 +186,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-
 
         FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
         if(currentUser != null){

@@ -1,18 +1,19 @@
-package com.example.alphachat.Activity;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+package com.example.alphachat.Fragment;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.alphachat.Adapter.FriendsAdapter;
 import com.example.alphachat.Model.Friends;
@@ -27,23 +28,23 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddFriendActivity extends AppCompatActivity {
+public class AddFriendsFragment extends Fragment {
 
     private DatabaseReference mDatabaseReference, dbRef;
     List<Friends> friendsList;
     private ProgressBar usersProgressbar;
     RecyclerView usersRecyclerView;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_friend);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_add_friend, container, false);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users");
-        final SearchView searchView = findViewById(R.id.add_friend_search_view);
-        usersProgressbar = findViewById(R.id.users_progressbar);
+        final SearchView searchView = view.findViewById(R.id.add_friend_search_view);
+        usersProgressbar = view.findViewById(R.id.users_progressbar);
         searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        usersRecyclerView = findViewById(R.id.users_recycler_view);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersRecyclerView = view.findViewById(R.id.users_recycler_view);
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         usersRecyclerView.setHasFixedSize(true);
         usersProgressbar.setVisibility(View.GONE);
 
@@ -61,6 +62,8 @@ public class AddFriendActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        return view;
     }
 
     private void getUsersList(final String query) {
@@ -121,16 +124,16 @@ public class AddFriendActivity extends AppCompatActivity {
                     );
                     dbRef.child("friends").push().setValue(fr);
                     addToFriendList(friend);
-                    Toast.makeText(AddFriendActivity.this, friend.getFriend_name() + " added as friend",
+                    Toast.makeText(getContext(), friend.getFriend_name() + " added as friend",
                             Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(AddFriendActivity.this, "Already added as friend!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Already added as friend!", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(AddFriendActivity.this, "An error occurred!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "An error occurred!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -161,5 +164,6 @@ public class AddFriendActivity extends AppCompatActivity {
         }
         return false;
     }
+
 
 }

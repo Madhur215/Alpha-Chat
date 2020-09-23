@@ -35,6 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
@@ -91,6 +94,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                             public void onConnected(@Nullable Bundle bundle) {
                                 mFirebaseAuth.signOut();
                                 Auth.GoogleSignInApi.signOut(googleApiClient);
+                                setStatus();
                                 startActivity(new Intent(SplashActivity.this, SplashActivity.class));
                                 finish();
                             }
@@ -103,6 +107,15 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
             }
         }
 
+    }
+
+    private void setStatus() {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("users/" + PrefUtils.getUserId());
+        Map<String, Object> mp = new HashMap<>();
+        mp.put("isOnline", "false");
+        ref.updateChildren(mp);
     }
 
     @Override
@@ -160,6 +173,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                                         mDatabaseReference.child(uid + "/" + "image").setValue(photoUrl);
                                         mDatabaseReference.child(uid + "/" + "uid").setValue(uid);
                                         mDatabaseReference.child(uid + "/" + "email").setValue(email);
+                                        mDatabaseReference.child(uid + "/" + "isOnline").setValue("Online");
                                     }
                                 }
 
@@ -169,8 +183,9 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                                             Toast.LENGTH_SHORT).show();
                                 }
                             });
-
-                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                            intent.putExtra(MainActivity.UPDATE_STATUS, "NO_CHANGE");
+                            startActivity(intent);
                             finish();
                         }
                         else{

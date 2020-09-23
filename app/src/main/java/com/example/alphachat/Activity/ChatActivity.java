@@ -25,6 +25,7 @@ import com.example.alphachat.Adapter.ChatMessageAdapter;
 import com.example.alphachat.Model.Message;
 import com.example.alphachat.R;
 import com.example.alphachat.Util.AES;
+import com.example.alphachat.Util.DateAndTime;
 import com.example.alphachat.Util.PrefUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.gms.tasks.Continuation;
@@ -35,14 +36,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -51,7 +55,6 @@ public class ChatActivity extends AppCompatActivity {
     public static final String FRIEND_IMAGE = "image";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
     private static final int RC_PHOTO_PICKER =  105;
-    private String DATE, TIME;
 
     private AES aes;
     private ChatMessageAdapter messageAdapter;
@@ -63,10 +66,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mChildEventListener;
-    private DatabaseReference mDatabaseReference;
+    private DatabaseReference mDatabaseReference, onlineRef;
     private StorageReference mStorageReference;
-
-    private HashMap<Integer, String> months = new HashMap<>();
+    private DateAndTime dt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class ChatActivity extends AppCompatActivity {
 
         TextView friend_name_text_view = findViewById(R.id.chat_activity_friend_name);
         ImageView friend_image_view = findViewById(R.id.chat_activity_friend_image);
+        final TextView lastSeenOrOnlineText = findViewById(R.id.last_seen_text_view);
         friend_image_view.setImageURI(Uri.parse(getIntent().getStringExtra(FRIEND_IMAGE)));
         friend_name_text_view.setText(getIntent().getStringExtra(FRIEND_NAME));
         send_button = findViewById(R.id.send_message_image);
@@ -83,26 +86,29 @@ public class ChatActivity extends AppCompatActivity {
         messageEditText = findViewById(R.id.message_edit_text);
         select_image = findViewById(R.id.send_image_chat);
 
+        dt = new DateAndTime();
         aes = new AES(this);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        onlineRef = FirebaseDatabase.getInstance().getReference("users/" + PrefUtils.getUserId());
         mStorageReference = FirebaseStorage.getInstance().getReference().child("photos");
         init();
         setEditText();
         fetchMessages(this);
 
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/users/" +
+                getIntent().getStringExtra(FRIEND_ID));
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String status = String.valueOf(snapshot.child("isOnline").getValue());
+                    lastSeenOrOnlineText.setText(status);
+            }
 
-        months.put(1, "Jan");
-        months.put(2, "Feb");
-        months.put(3, "Mar");
-        months.put(4, "Apr");
-        months.put(5, "May");
-        months.put(6, "Jun");
-        months.put(7, "Jul");
-        months.put(8, "Aug");
-        months.put(9, "Sep");
-        months.put(10, "Oct");
-        months.put(11, "Nov");
-        months.put(12, "Dec");
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         select_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,40 +216,18 @@ public class ChatActivity extends AppCompatActivity {
         if(messageEditText.getText().toString().trim().length() == 0)
             return;
 
-        setTimeAndDate();
         String encryptedMessage = aes.Encrypt(messageEditText.getText().toString().trim(), this);
         Message message = new Message(PrefUtils.getUserId(),
                                         getIntent().getStringExtra(FRIEND_ID),
                                         encryptedMessage,
-                                        TIME, DATE, null);
+                                        dt.getTime(), dt.getDATE(), null);
         mDatabaseReference.push().setValue(message);
         messageEditText.setText("");
-    }
-
-    private void setTimeAndDate(){
-        Calendar calendar = Calendar.getInstance();
-        String day = Integer.toString(calendar.get(Calendar.DATE));
-        String month = months.get(calendar.get(Calendar.MONTH) + 1);
-        String year = Integer.toString(calendar.get(Calendar.YEAR));
-        year = String.valueOf(year.charAt(2)) + year.charAt(3);
-        if(day.length() == 1)
-            day = "0" + day;
-        DATE = day + " " + month + " " + year;
-        String hour = Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
-        String minute = Integer.toString(calendar.get(Calendar.MINUTE));
-        if(minute.length() == 1){
-            minute = "0" + minute;
-        }
-        if(hour.length() == 1){
-            hour = "0" + hour;
-        }
-        TIME = hour + ":" + minute;
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        PrefUtils.LAST_MESSAGE_DATE = "99/99/9999";
         if(mChildEventListener != null){
             mDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
@@ -274,11 +258,35 @@ public class ChatActivity extends AppCompatActivity {
                         Message message = new Message(PrefUtils.getUserId(),
                                                         getIntent().getStringExtra(FRIEND_ID),
                                                         null,
-                                                        TIME, DATE, downloadUri.toString());
+                                                        dt.getTime(), dt.getDATE(), downloadUri.toString());
                         mDatabaseReference.push().setValue(message);
                     }
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setStatus("Online");
+    }
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        setStatus("false");
+//    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        setStatus("Last seen at " + dt.getTime());
+    }
+
+    private void setStatus(String status){
+        Map<String, Object> mp = new HashMap<>();
+        mp.put("isOnline", status);
+        onlineRef.updateChildren(mp);
     }
 }

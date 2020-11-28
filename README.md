@@ -14,8 +14,11 @@ users' privacy through end-to-end encryption.
 
 ## Screenshots
 ![Splash Screen](/Images/2.png)
+<br>
 ![Login](/Images/1.jpg)
+<br>
 ![Friend List](/Images/3.png)
-![Chat](/Images/Alphachat.gif)
+<br>
+![Chat](/Images/chat2.gif)
 
 

@@ -13,6 +13,6 @@ users' privacy through end-to-end encryption.
 * Share text messages and images with friends.
 
 ## Screenshots
-![Splash Screen](/images/1.jpg)
+![Splash Screen](/Images/1.jpg)
 
 

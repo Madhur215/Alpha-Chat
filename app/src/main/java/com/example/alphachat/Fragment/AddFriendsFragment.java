@@ -39,7 +39,7 @@ public class AddFriendsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_friend, container, false);
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users");
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("/users/");
         final SearchView searchView = view.findViewById(R.id.add_friend_search_view);
         usersProgressbar = view.findViewById(R.id.users_progressbar);
         searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
@@ -89,23 +89,26 @@ public class AddFriendsFragment extends Fragment {
     }
 
     private void filterUsers(List<Friends> allUsersList, String query) {
+
+        friendsList = new ArrayList<>();
         for(Friends user : allUsersList){
             if((user.getFriend_name().toLowerCase().contains(query) ||
                     user.getEmail().toLowerCase().contains(query)) &&
                     !user.getFriend_id().equals(PrefUtils.getUserId())){
-                friendsList = new ArrayList<>();
                 friendsList.add(user);
-                FriendsAdapter mAdapter = new FriendsAdapter(friendsList);
-                usersRecyclerView.setAdapter(mAdapter);
-                mAdapter.setOnClickListener(new FriendsAdapter.OnFriendClickListener() {
-                    @Override
-                    public void onFriendClick(Friends friend) {
-                        addUsersToFriendList(friend);
-                    }
-                });
+
             }
         }
+        try {
+            FriendsAdapter mAdapter = new FriendsAdapter(friendsList);
+            usersRecyclerView.setAdapter(mAdapter);
+            mAdapter.setOnClickListener(this::addUsersToFriendList);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
         usersProgressbar.setVisibility(View.GONE);
+
     }
 
     private void addUsersToFriendList(final Friends friend) {
@@ -117,7 +120,7 @@ public class AddFriendsFragment extends Fragment {
                     Friends fr = new Friends(
                             friend.getFriend_name(),
                             friend.getFriend_image(),
-                            "No messages yet",
+                            "Tap to view",
                             friend.getFriend_id(),
                             friend.getEmail(),
                             false

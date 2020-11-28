@@ -2,19 +2,23 @@ package com.example.alphachat.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaExtractor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,12 +45,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.jitsi.meet.sdk.JitsiMeet;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.JitsiMeetUserInfo;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -55,6 +67,8 @@ public class ChatActivity extends AppCompatActivity {
     public static final String FRIEND_IMAGE = "image";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 500;
     private static final int RC_PHOTO_PICKER =  105;
+    private String SECRET_STRING = "JITMEETALPHA";
+    private String MeetCode;
 
     private AES aes;
     private ChatMessageAdapter messageAdapter;
@@ -62,7 +76,6 @@ public class ChatActivity extends AppCompatActivity {
     private List<Message> messageList = new ArrayList<>();
     private EditText messageEditText;
     private ImageView send_button;
-    private ImageView select_image;
 
     private FirebaseDatabase mFirebaseDatabase;
     private ChildEventListener mChildEventListener;
@@ -81,10 +94,17 @@ public class ChatActivity extends AppCompatActivity {
         final TextView lastSeenOrOnlineText = findViewById(R.id.last_seen_text_view);
         friend_image_view.setImageURI(Uri.parse(getIntent().getStringExtra(FRIEND_IMAGE)));
         friend_name_text_view.setText(getIntent().getStringExtra(FRIEND_NAME));
+        ImageView video_call_image = findViewById(R.id.video_call_image);
+        video_call_image.setOnClickListener(view -> {
+                MeetCode = getMeetingCode();
+                sendMessage(true);
+                VideoCall();
+            }
+        );
         send_button = findViewById(R.id.send_message_image);
         messageRecyclerView = findViewById(R.id.recycler_view_messages);
         messageEditText = findViewById(R.id.message_edit_text);
-        select_image = findViewById(R.id.send_image_chat);
+        ImageView select_image = findViewById(R.id.send_image_chat);
 
         dt = new DateAndTime();
         aes = new AES(this);
@@ -110,22 +130,14 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        select_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Complete action using"),
-                        RC_PHOTO_PICKER);
-            }
+        select_image.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/jpeg");
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            startActivityForResult(Intent.createChooser(intent, "Complete action using"),
+                    RC_PHOTO_PICKER);
         });
-        send_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessage();
-            }
-        });
+        send_button.setOnClickListener(v -> sendMessage(false));
     }
 
     private void setEditText() {
@@ -178,7 +190,11 @@ public class ChatActivity extends AppCompatActivity {
                 Message message = snapshot.getValue(Message.class);
                 if(message.getPhotoUrl() == null) {
                     String decryptedMessage = aes.Decrypt(message.getMessage(), context);
-                    messageList.add(new Message(message.getSender_id(), message.getReceiver_id(), decryptedMessage,
+                    int check = isVideoCall(decryptedMessage, message.getSender_id());
+                    if(check == 2)
+                        showVideoCallDialog(message.getTimestamp());
+                    else if(check == 0)
+                        messageList.add(new Message(message.getSender_id(), message.getReceiver_id(), decryptedMessage,
                             message.getTimestamp(), message.getDate(), message.getPhotoUrl()));
                 }
                 else{
@@ -211,12 +227,54 @@ public class ChatActivity extends AppCompatActivity {
         mDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
-    private void sendMessage() {
+    // Checks whether a particular message is a video call request
+    // If yes, then changes the MeetCode and return true
+    // So that we can show a dialog to the user that he is
+    // Receiving a video call.
+    int isVideoCall(String message, String sender){
 
-        if(messageEditText.getText().toString().trim().length() == 0)
+        if(message.length() < 23) return 0;
+        int i;
+        for(i = 0; i < 12; i++){
+            if(message.charAt(i) != SECRET_STRING.charAt(i))
+                return 0;
+        }
+        if(message.charAt(i) != '_') return 0;
+        if(sender.equals(PrefUtils.getUserId())) return 1;
+        StringBuilder code = new StringBuilder();
+        i++;
+        for(; i < message.length(); i++)
+            code.append(message.charAt(i));
+        MeetCode = code.toString();
+        return 2;
+    }
+
+    void showVideoCallDialog(String time){
+        String timeNow = dt.getTime();
+        int diff = dt.TimeDifference(time, timeNow);
+        if(diff > 1) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getIntent().getStringExtra(FRIEND_NAME) + "is requesting a video call")
+                .setPositiveButton("Accept", (dialog, id) -> {
+                    VideoCall();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Decline", (dialog, id) -> dialog.dismiss());
+        builder.create().show();
+    }
+
+    private void sendMessage(boolean isVideoCall) {
+
+        if(messageEditText.getText().toString().trim().length() == 0 && !isVideoCall)
             return;
 
-        String encryptedMessage = aes.Encrypt(messageEditText.getText().toString().trim(), this);
+        String str;
+        if(isVideoCall)
+            str = SECRET_STRING + "_" + MeetCode;
+        else
+            str = messageEditText.getText().toString().trim();
+
+        String encryptedMessage = aes.Encrypt(str, this);
         Message message = new Message(PrefUtils.getUserId(),
                                         getIntent().getStringExtra(FRIEND_ID),
                                         encryptedMessage,
@@ -272,12 +330,6 @@ public class ChatActivity extends AppCompatActivity {
         setStatus("Online");
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        setStatus("false");
-//    }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -288,5 +340,47 @@ public class ChatActivity extends AppCompatActivity {
         Map<String, Object> mp = new HashMap<>();
         mp.put("isOnline", status);
         onlineRef.updateChildren(mp);
+    }
+
+    private void VideoCall() {
+        URL serverURL;
+        try {
+            serverURL = new URL("https://meet.jit.si");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Invalid server URL!");
+        }
+        JitsiMeetUserInfo userInfo=new JitsiMeetUserInfo();
+        userInfo.setDisplayName(PrefUtils.getUserFullName());
+        userInfo.setEmail(PrefUtils.getUserEmail());
+
+        JitsiMeetConferenceOptions defaultOptions
+                = new JitsiMeetConferenceOptions.Builder()
+                .setServerURL(serverURL)
+                .setUserInfo(userInfo)
+                .setWelcomePageEnabled(false)
+                .build();
+        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+        JitsiMeetConferenceOptions options
+                = new JitsiMeetConferenceOptions.Builder()
+                .setFeatureFlag("meeting-name.enabled",false)
+                .setRoom(MeetCode)
+                .build();
+        JitsiMeetActivity.launch(this, options);
+    }
+
+    String getMeetingCode(){
+
+        int leftLimit = 97;
+        int rightLimit = 122;
+        int targetStringLength = 10;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(targetStringLength);
+        for (int i = 0; i < targetStringLength; i++) {
+            int randomLimitedInt = leftLimit + (int)
+                    (random.nextFloat() * (rightLimit - leftLimit + 1));
+            buffer.append((char) randomLimitedInt);
+        }
+        return buffer.toString();
     }
 }

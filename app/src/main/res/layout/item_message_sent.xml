@@ -22,8 +22,9 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/photoImageView"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="250dp"
+        android:background="@drawable/image_border_sent_message"
         android:adjustViewBounds="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

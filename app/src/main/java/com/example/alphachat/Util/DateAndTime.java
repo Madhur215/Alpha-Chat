@@ -1,5 +1,7 @@
 package com.example.alphachat.Util;
 
+import android.content.Intent;
+
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -45,6 +47,15 @@ public class DateAndTime {
         if(day.length() == 1)
             day = "0" + day;
         return day + " " + month + " " + year;
+    }
+
+    public int TimeDifference(String t1, String t2){
+        String h1 = t1.substring(0, 2), h2 = t2.substring(0, 2);
+        if(!h1.equals(h2)){
+            return Math.abs(Integer.parseInt(h1) - Integer.parseInt(h2)) * 60;
+        }
+        String m1 = t1.substring(3, 5), m2 = t2.substring(3, 5);
+        return Math.abs(Integer.parseInt(m1) - Integer.parseInt(m2));
     }
 
 }

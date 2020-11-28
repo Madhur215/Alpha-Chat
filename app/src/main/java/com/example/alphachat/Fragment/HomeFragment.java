@@ -1,6 +1,7 @@
 package com.example.alphachat.Fragment;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jitsi.meet.sdk.JitsiMeet;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.JitsiMeetUserInfo;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,8 +125,8 @@ public class HomeFragment extends Fragment {
         for(DataSnapshot data : friends.getChildren()){
             String name = data.child("friend_name").getValue().toString();
             String image = data.child("friend_image").getValue().toString();
-            String last_message = data.child("last_message").getValue().toString();
             String friend_id = data.child("friend_id").getValue().toString();
+            String last_message = data.child("last_message").getValue().toString();
             String email = data.child("email").getValue().toString();
             Friends friend = new Friends(name, image, last_message, friend_id, email, false);
             list.add(friend);

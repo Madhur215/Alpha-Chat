@@ -12,13 +12,13 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/photoImageView"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="250dp"
         android:adjustViewBounds="true"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/image_border"
+        app:layout_constraintStart_toStartOf="@+id/text_message_body"
         app:layout_constraintTop_toTopOf="parent"
-        fresco:roundedCornerRadius="8dp"
-        android:layout_marginBottom="10sp"/>
+        fresco:roundedCornerRadius="8dp" />
 
     <TextView
         android:id="@+id/text_message_body"

@@ -6,11 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.alphachat.R;
+import com.example.alphachat.Util.DateAndTime;
 import com.example.alphachat.Util.PrefUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -51,7 +54,9 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     private PrefUtils pr;
     String idToken;
     private ProgressBar progressBar;
+    private ImageView app_icon_image;
     private SignInButton signInButton;
+    private DateAndTime dt;
 
 
     @Override
@@ -62,8 +67,10 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         pr = new PrefUtils(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        dt = new DateAndTime();
 
         progressBar = findViewById(R.id.splash_activity_progress_bar);
+        app_icon_image = findViewById(R.id.app_icon_image);
         progressBar.setVisibility(View.GONE);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -79,6 +86,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
+                app_icon_image.setVisibility(View.GONE);
                 signInButton.setEnabled(false);
                 Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
                 startActivityForResult(intent, RC_SIGN_IN);
@@ -95,8 +103,9 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                                 mFirebaseAuth.signOut();
                                 Auth.GoogleSignInApi.signOut(googleApiClient);
                                 setStatus();
-                                startActivity(new Intent(SplashActivity.this, SplashActivity.class));
-                                finish();
+                                pr.eraseDetails();
+//                                startActivity(new Intent(SplashActivity.this, SplashActivity.class));
+//                                finish();
                             }
 
                             @Override
@@ -114,7 +123,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("users/" + PrefUtils.getUserId());
         Map<String, Object> mp = new HashMap<>();
-        mp.put("isOnline", "false");
+        mp.put("isOnline", "Last seen as " + dt.getTime());
         ref.updateChildren(mp);
     }
 
@@ -134,6 +143,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
             else{
                 signInButton.setEnabled(true);
                 progressBar.setVisibility(View.GONE);
+                app_icon_image.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -205,6 +215,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
         if(currentUser != null){
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            Log.e("CALLED", "onStart: CALLED!!!!!");
             finish();
         }
     }

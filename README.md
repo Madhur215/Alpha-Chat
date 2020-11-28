@@ -19,6 +19,6 @@ users' privacy through end-to-end encryption.
 <br>
 ![Friend List](/Images/3.png)
 <br>
-![Chat](/Images/chat.gif)
+![Chat](/Images/final.gif)
 
 

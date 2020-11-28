@@ -13,6 +13,9 @@ users' privacy through end-to-end encryption.
 * Share text messages and images with friends.
 
 ## Screenshots
-![Splash Screen](/Images/1.jpg)
+![Splash Screen](/Images/2.png)
+![Login](/Images/1.jpg)
+![Friend List](/Images/3.png)
+![Chat](/Images/Alphachat.gif)
 
 
